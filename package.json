@@ -1,22 +1,38 @@
 {
-  "name": "gulp-task",
+  "name": "@gcrda/gulp-task",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "Task helper for Gulp to make tasks easier to distribute and manage across files",
+  "main": "dist/gulp-task.js",
+  "author": "Richard King <richrdkng@gmail.com> (github.com/richrdkng)",
+  "license": "MIT",
+  "homepage": "https://github.com/gcrda/gulp-task#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gcrda/gulp-task.git"
   },
-  "author": "",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gcrda/gulp-task/issues"
   },
-  "homepage": "https://github.com/gcrda/gulp-task#readme"
+  "scripts": {
+    "gulp": "gulp --gulpfile task/main.js",
+    "test": "gulp --gulpfile task/main.js -- test-phantomjs",
+    "doc": "jsdoc src/**/*.js"
+  },
+  "devDependencies": {
+    "chai": "^3.4.0",
+    "gulp": "^3.9.0",
+    "gulp-debug": "^2.1.2",
+    "gulp-mocha": "^2.1.3",
+    "gulp-sequence": "^0.4.1",
+    "jsdoc": "^3.3.3"
+  },
+  "keywords": [
+    "gulp",
+    "task",
+    "helper",
+    "gulp-task",
+    "gulp.task",
+    "gulp/task",
+    "gulpTask"
+  ]
 }
