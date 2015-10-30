@@ -1,7 +1,7 @@
 var Gulp;
 
 var gulp     = require('gulp'),
-    sequence = require('gulp-sequence');
+    sequence = require('gulp-sequence').use(gulp);
 
 var DEFAULT_NAME = 'task_',
     DEFAULT_NAME_LENGTH = 16;
@@ -33,7 +33,10 @@ function isString(object) {
     return typeof object === 'string';
 }
 function isArray(object) {
-    return Object.prototype.toString.call(object) === '[object Object]';
+    return Object.prototype.toString.call(object) === '[object Array]';
+}
+function isArguments(object) {
+    return Object.prototype.toString.call(object) === '[object Arguments]';
 }
 function isFunction(object) {
     return typeof object === 'function';
@@ -41,17 +44,18 @@ function isFunction(object) {
 function isEmpty(string) {
     return string.length === 0 && /\s+/.test(string);
 }
-
+function isNullOrUndefined(object) {
+    return object === null || typeof object === 'undefined';
+}
 function pickArray(paramArr) {
     for (var i = 0, len = paramArr.length; i < len; ++i) {
-        if (Object.prototype.toString.call(paramArr[i]) === '[object Object]') {
+        if (isArray(paramArr[i])) {
             return paramArr[i];
         }
     }
 
     return null;
 }
-
 function pickFunction(paramArr) {
     for (var i = 0, len = paramArr.length; i < len; ++i) {
         if (typeof paramArr[i] === 'function') {
@@ -60,30 +64,6 @@ function pickFunction(paramArr) {
     }
 
     return null;
-}
-
-function addTask(gulp, task) {
-    var args;
-
-    if(task instanceof Task) {
-        args = [
-            task.getName(),
-            task.getDependencies()
-        ];
-
-        if(task.hasFunc()) {
-            args.push(task.getFunc());
-        }
-
-        gulp.task.apply(gulp, args);
-
-    } else if(Object.prototype.toString.call(task) === '[object Object]') {
-        for(var k in task) {
-            if(task.hasOwnProperty(k)) {
-                addTask(gulp, task[k]);
-            }
-        }
-    }
 }
 
 /**
@@ -140,10 +120,6 @@ function Task(name, dependencies, func) {
         n = generateName();
     }
 
-    if (!d && !fn) {
-        throw new Error('A dependency list or a task function must be specified.');
-    }
-
     if (!d) {
         d = [];
     }
@@ -154,12 +130,15 @@ function Task(name, dependencies, func) {
 
     this.name         = n;
     this.dependencies = d;
-    this.func         = fn
+    this.func         = fn;
+
+    //console.log('new Task', n, d, fn);
+    console.log('new Task', this);
+    //console.log('new Task', arguments);
 }
 
 Task.prototype = {
     constructor: Task,
-
     getName: function() {
         return this.name;
     },
@@ -173,22 +152,62 @@ Task.prototype = {
         return !!this.func;
     },
     getFunction: function() {
-        return this.func;
-    },
-    addToGulp: function() {
-        gulp.task(this.getName(), this.getDependencies(), this.getFunction());
+        return this.func || function() {};
     }
 };
 
-Task.to = function(gulp) {
-    Gulp = gulp;
-    return Task;
-};
+/**
+ *
+ * @function add
+ *
+ * @param {string}   name
+ * @param {Array}    dependencies
+ * @param {function} func
+ */
+/**
+ *
+ * @function add
+ *
+ * @param {...Task} task
+ */
 Task.add = function(task) {
-    addTask(Gulp, task);
-    return Task;
+    var t = task,
+        name, dep, func, argv;
+
+    if (!(t instanceof Task)) {
+        argv = arguments;
+        t = new Task(argv[0], argv[1], argv[2]);
+    }
+
+    name = t.getName();
+    dep  = t.getDependencies();
+    func = t.getFunction().bind(gulp);
+
+    if (t.hasDependencies()) {
+        gulp.task(name, function() {
+            sequence.apply(null, dep)(func);
+        });
+    } else {
+        gulp.task(name, func);
+    }
 };
-Task.addToGulp = function() {
+
+Task.start = function(task) {
+    var name = 'default',
+        argv;
+
+    if (isString(task)) {
+        name = task;
+    } else if (task instanceof Task) {
+        name = task.getName();
+    } else if (isNullOrUndefined(task)) {
+        name = 'default';
+    } else {
+        argv = arguments;
+        name = new Task(argv[0], argv[1], argv[2]).getName();
+    }
+
+    gulp.start.call(gulp, name);
 };
 
 /** @exports Task */
