@@ -1,14 +1,17 @@
-var path = require('path'),
-    root = path.resolve(__dirname, '../');
+function getPath() {
+    var p    = require('path'),
+        root = p.normalize(process.cwd()),
+        args = Array.prototype.slice.call(arguments, 0).join('/');
+
+    return p.normalize(root + '/' + args);
+}
 
 module.exports = {
-    name : 'gulp-task',
-    root : root,
-    main : path.resolve(root, './src', './gulp-task.js'),
     path : {
-        root : root,
-        dist : path.resolve(root, './dist'),
-        src  : path.resolve(root, './src'),
-        test : path.resolve(root, './test')
+        root    : getPath(),
+        project : getPath('/project'),
+        src     : getPath('/src'),
+        dist    : getPath('/dist'),
+        test    : getPath('/test')
     }
 };
