@@ -1,70 +1,11 @@
-var Gulp;
+var include  = require('rekuire'),
+    util     = include('utils'),
 
-var gulp     = require('gulp'),
-    sequence = require('gulp-sequence').use(gulp);
+    gulp     = require('gulp'),
+    sequence = require('gulp-sequence').use(gulp),
+    flatten  = require('array-flatten'),
 
-var DEFAULT_NAME = 'task_',
-    DEFAULT_NAME_LENGTH = 16;
-
-/**
- * Generates a default name for the task
- *
- * @private
- *
- * @returns {string}
- */
-function generateName() {
-    var name  = DEFAULT_NAME,
-        bound = DEFAULT_NAME_LENGTH - name.length,
-        chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-
-    if (bound < 0) {
-        bound = 0;
-    }
-
-    while (bound--) {
-        name += chars[Math.floor(Math.random() * chars.length)];
-    }
-
-    return name;
-}
-
-function isString(object) {
-    return typeof object === 'string';
-}
-function isArray(object) {
-    return Object.prototype.toString.call(object) === '[object Array]';
-}
-function isArguments(object) {
-    return Object.prototype.toString.call(object) === '[object Arguments]';
-}
-function isFunction(object) {
-    return typeof object === 'function';
-}
-function isEmpty(string) {
-    return string.length === 0 && /\s+/.test(string);
-}
-function isNullOrUndefined(object) {
-    return object === null || typeof object === 'undefined';
-}
-function pickArray(paramArr) {
-    for (var i = 0, len = paramArr.length; i < len; ++i) {
-        if (isArray(paramArr[i])) {
-            return paramArr[i];
-        }
-    }
-
-    return null;
-}
-function pickFunction(paramArr) {
-    for (var i = 0, len = paramArr.length; i < len; ++i) {
-        if (typeof paramArr[i] === 'function') {
-            return paramArr[i];
-        }
-    }
-
-    return null;
-}
+    noop     = function() {};
 
 /**
  * Description for B
@@ -107,88 +48,77 @@ function pickFunction(paramArr) {
  * @param {function} [func]
  */
 function Task(name, dependencies, func) {
-    var n, d, fn;
+    var _name, _deps, _func;
 
-    if (isString(name) && !isEmpty(name)) {
-        n = name;
+    if (util.isString(name) && !util.isEmpty(name)) {
+        _name = name;
     }
 
-    d  = pickArray([name, dependencies]);
-    fn = pickFunction([name, dependencies, func]);
+    _deps = util.pickArray([name, dependencies]);
+    _func = util.pickFunction([name, dependencies, func]);
 
-    if (!n) {
-        n = generateName();
+    if (!_name) {
+        _name = util.generateName();
     }
 
-    if (!d) {
-        d = [];
+    if (!_deps) {
+        _deps = [];
     }
 
-    if (!fn) {
-        fn = false;
+    if (_deps.length > 0) {
+        var seq = [];
+
+        // flatten out the dependencies deeper, than 1 level
+        _deps.forEach(function(value) {
+            if (typeof value === 'string') {
+                seq.push(value);
+            } else if (Array.isArray(value)) {
+                seq.push(flatten(value));
+            }
+        });
+
+        _deps = seq;
     }
 
-    this.name         = n;
-    this.dependencies = d;
-    this.func         = fn;
+    if (!_func) {
+        _func = false;
+    }
 
-    //console.log('new Task', n, d, fn);
-    console.log('new Task', this);
-    //console.log('new Task', arguments);
+    this._name = _name;
+    this._deps = _deps;
+    this._func = _func;
+
+    var self = this,
+        fn   = this.getFunction();
+
+    if (this.hasDependencies()) {
+        gulp.task(this.getName(), function(cb) {
+            sequence.apply(null, self.getDependencies())(function() {
+                fn.call(gulp, gulp.src, gulp.dest, cb);
+            });
+        });
+    } else {
+        gulp.task(this.getName(), fn.bind(gulp, gulp.src, gulp.dest));
+    }
 }
 
 Task.prototype = {
     constructor: Task,
+
     getName: function() {
-        return this.name;
+        return this._name;
     },
     hasDependencies: function() {
-        return this.dependencies.length > 0;
+        return this._deps.length > 0;
     },
     getDependencies: function() {
-        return this.dependencies;
+        return this._deps;
     },
     hasFunction: function() {
-        return !!this.func;
+        return !!this._func;
     },
     getFunction: function() {
-        return this.func || function() {};
-    }
-};
-
-/**
- *
- * @function add
- *
- * @param {string}   name
- * @param {Array}    dependencies
- * @param {function} func
- */
-/**
- *
- * @function add
- *
- * @param {...Task} task
- */
-Task.add = function(task) {
-    var t = task,
-        name, dep, func, argv;
-
-    if (!(t instanceof Task)) {
-        argv = arguments;
-        t = new Task(argv[0], argv[1], argv[2]);
-    }
-
-    name = t.getName();
-    dep  = t.getDependencies();
-    func = t.getFunction().bind(gulp);
-
-    if (t.hasDependencies()) {
-        gulp.task(name, function() {
-            sequence.apply(null, dep)(func);
-        });
-    } else {
-        gulp.task(name, func);
+        return this._func || noop;
     }
 };
 
@@ -196,11 +126,11 @@ Task.start = function(task) {
     var name = 'default',
         argv;
 
-    if (isString(task)) {
+    if (util.isString(task)) {
         name = task;
     } else if (task instanceof Task) {
         name = task.getName();
-    } else if (isNullOrUndefined(task)) {
+    } else if (util.isNullOrUndefined(task)) {
         name = 'default';
     } else {
         argv = arguments;
