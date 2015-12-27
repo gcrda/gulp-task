@@ -14,8 +14,12 @@
   },
   "main": "src/gulp-task.js",
   "scripts": {
+    "test": "node tests",
     "gulp": "gulp --gulpfile tasks",
-    "test": "node tests"
+    "bump": "gulp --gulpfile tasks -- bump",
+    "bump-major": "gulp --gulpfile tasks -- bump-major",
+    "bump-minor": "gulp --gulpfile tasks -- bump-minor",
+    "bump-patch": "gulp --gulpfile tasks -- bump-patch"
   },
   "dependencies": {
     "array-flatten": "^2.0.0",
@@ -26,6 +30,7 @@
   "devDependencies": {
     "array-flatten": "^2.0.0",
     "gulp": "^3.9.0",
+    "gulp-bump": "^1.0.0",
     "gulp-debug": "^2.1.2",
     "gulp-file": "^0.2.0",
     "gulp-sequence": "^0.4.4",
