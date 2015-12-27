@@ -11,7 +11,6 @@ module.exports = {
         root    : getPath(),
         project : getPath('/project'),
         src     : getPath('/src'),
-        dist    : getPath('/dist'),
-        test    : getPath('/test')
+        tests   : getPath('/tests')
     }
 };

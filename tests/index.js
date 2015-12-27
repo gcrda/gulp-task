@@ -3,8 +3,8 @@ var include = require('rekuire'),
     project = include('project'),
     root    = project.path.root,
 
-    file     = require('gulp-file'),
-    debug    = require('gulp-debug'),
+    file    = require('gulp-file'),
+    debug   = require('gulp-debug'),
 
     task    = include('src/gulp-task');
 
@@ -40,7 +40,7 @@ new task('D', function(src) {
         .pipe(debug());
 });
 
-new task('def', ['A', ['B', 'C'], 'D'], function(src) {
+new task('def', ['A', ['B', ['C']], 'D'], function(src) {
     return src('x')
         .pipe(file('def', ''))
         .pipe(debug());
