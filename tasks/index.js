@@ -56,3 +56,13 @@ gulp.task('tag', function() {
         .src(file.package_json)
         .pipe(tag());
 });
+
+gulp.task('publish', function() {
+    var pkg     = require(file.package_json),
+        version = pkg.version,
+        message = 'v' + version;
+
+    return gulp.src('')
+        .pipe(git.commit(message))
+        .pipe(git.tag(message));
+});
