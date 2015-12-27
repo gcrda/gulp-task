@@ -4,6 +4,6 @@ Task helper for Gulp to make tasks easier to manage and handle accross multiple 
 
 install:
 
-'''
+```
     npm install @gcrda/gulp-task
-'''
+```
