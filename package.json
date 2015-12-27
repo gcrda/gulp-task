@@ -14,9 +14,9 @@
     "url": "https://github.com/gcrda/gulp-task/issues"
   },
   "scripts": {
-    "gulp": "gulp --gulpfile task",
-    "test": "gulp --gulpfile test",
-    "dist": "gulp --gulpfile task -- dist",
+    "gulp": "gulp --gulpfile tasks",
+    "test": "node tests",
+    "compile": "gulp --gulpfile task -- compile",
     "doc": "jsdoc src -d doc"
   },
   "dependencies": {
@@ -26,15 +26,13 @@
     "rekuire": "^0.1.9"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
     "gulp": "^3.9.0",
     "gulp-debug": "^2.1.2",
     "gulp-file": "^0.2.0",
     "gulp-mocha": "^2.2.0",
     "gulp-sequence": "^0.4.4",
     "gulp-uglify": "^1.5.1",
-    "jsdoc": "^3.4.0",
-    "mocha": "^2.3.4"
+    "jsdoc": "^3.4.0"
   },
   "keywords": [
     "gulp",
