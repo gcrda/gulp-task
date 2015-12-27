@@ -2,9 +2,8 @@
   "name": "@gcrda/gulp-task",
   "version": "1.0.0",
   "description": "Task helper for Gulp to make tasks easier to manage and handle accross multiple files",
-  "main": "dist/gulp-task.js",
-  "author": "Richard King <richrdkng@gmail.com> (github.com/richrdkng)",
   "license": "MIT",
+  "author": "Richard King <richrdkng@gmail.com> (github.com/richrdkng)",
   "homepage": "https://github.com/gcrda/gulp-task#readme",
   "repository": {
     "type": "git",
@@ -13,11 +12,10 @@
   "bugs": {
     "url": "https://github.com/gcrda/gulp-task/issues"
   },
+  "main": "src/gulp-task.js",
   "scripts": {
     "gulp": "gulp --gulpfile tasks",
-    "test": "node tests",
-    "compile": "gulp --gulpfile task -- compile",
-    "doc": "jsdoc src -d doc"
+    "test": "node tests"
   },
   "dependencies": {
     "array-flatten": "^2.0.0",
@@ -26,20 +24,21 @@
     "rekuire": "^0.1.9"
   },
   "devDependencies": {
+    "array-flatten": "^2.0.0",
     "gulp": "^3.9.0",
     "gulp-debug": "^2.1.2",
     "gulp-file": "^0.2.0",
-    "gulp-mocha": "^2.2.0",
     "gulp-sequence": "^0.4.4",
-    "gulp-uglify": "^1.5.1",
-    "jsdoc": "^3.4.0"
+    "rekuire": "^0.1.9"
   },
   "keywords": [
     "gulp",
     "task",
     "helper",
+    "utility",
     "gulp-task",
     "gulp.task",
+    "gulp task",
     "gulp/task",
     "gulpTask"
   ]
