@@ -19,8 +19,7 @@
     "bump": "gulp --gulpfile tasks -- bump",
     "bump-major": "gulp --gulpfile tasks -- bump-major",
     "bump-minor": "gulp --gulpfile tasks -- bump-minor",
-    "bump-patch": "gulp --gulpfile tasks -- bump-patch",
-    "tag": "gulp --gulpfile tasks -- tag"
+    "bump-patch": "gulp --gulpfile tasks -- bump-patch"
   },
   "dependencies": {
     "array-flatten": "^2.0.0",

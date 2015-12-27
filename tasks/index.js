@@ -1,7 +1,9 @@
 var include = require('rekuire'),
 
     gulp    = require('gulp'),
+    debug   = require('gulp-debug'),
     bump    = require('gulp-bump'),
+    git     = require('gulp-git'),
     tag     = require('gulp-tag-version'),
 
     project = include('project'),
@@ -36,6 +38,17 @@ gulp.task('bump', ['bump-minor']);
             .pipe(bump({type : 'patch'}))
             .pipe(gulp.dest(root));
     });
+
+// git commit task
+gulp.task('commit', function() {
+    var pkg     = require(file.package_json),
+        version = pkg.version,
+        message = 'v' + version;
+
+    return gulp
+        .src(file.package_json)
+        .pipe(git.commit(message));
+});
 
 // tag task
 gulp.task('tag', function() {
