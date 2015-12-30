@@ -47,13 +47,16 @@ gulp.task('git-commit', function(cb) {
         version = pkg.version,
         message = 'v' + version;
 
-    git.commit(message, function(error) {
-        if (error) {
-            throw error;
-        }
+    gulp
+        .src(file.package_json)
+        .pipe(git.commit(message, function(error) {
+            if (error) {
+                // TODO fix wrongly given error about unsuccessful commit (gulp-git bug)
+                process.exit(); // exit until the bug above is not fixed
+            }
 
-        cb();
-    });
+            cb(); // need cb() in order to signal that this task has ended (gulp-git bug)
+        }));
 });
 
 // git tag task
@@ -88,7 +91,7 @@ gulp.task('npm-publish', function(cb) {
                 throw error;
             }
 
-            cb();
+            process.exit(); // exit instead of cb(); in order to stop re-executing the whole "publish" task because of gulp-git bug
         });
     });
 });
