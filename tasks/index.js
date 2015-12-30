@@ -1,17 +1,19 @@
-var include = require('rekuire'),
+var include  = require('rekuire'),
 
-    gulp    = require('gulp'),
-    debug   = require('gulp-debug'),
-    bump    = require('gulp-bump'),
-    git     = require('gulp-git'),
-    tag     = require('gulp-tag-version'),
+    gulp     = require('gulp'),
+    sequence = require('gulp-sequence'),
+    debug    = require('gulp-debug'),
+    bump     = require('gulp-bump'),
+    git      = require('gulp-git'),
+    tag      = require('gulp-tag-version'),
+    npm      = require('npm'),
 
-    project = include('project'),
+    project  = include('project'),
 
-    path    = project.path,
-    root    = path.root,
+    path     = project.path,
+    root     = path.root,
 
-    file    = {
+    file     = {
         package_json : root + '/package.json'
     };
 
@@ -40,29 +42,61 @@ gulp.task('bump', ['bump-minor']);
     });
 
 // git commit task
-gulp.task('commit', function() {
+gulp.task('git-commit', function(cb) {
     var pkg     = require(file.package_json),
         version = pkg.version,
         message = 'v' + version;
 
-    return gulp
-        .src(file.package_json)
-        .pipe(git.commit(message));
+    git.commit(message, function(error) {
+        if (error) {
+            throw error;
+        }
+
+        cb();
+    });
 });
 
-// tag task
-gulp.task('tag', function() {
+// git tag task
+gulp.task('git-tag', function() {
     return gulp
         .src(file.package_json)
         .pipe(tag());
 });
 
-gulp.task('publish', function() {
-    var pkg     = require(file.package_json),
-        version = pkg.version,
-        message = 'v' + version;
+// git push task
+gulp.task('git-push', function(cb) {
+    git.push('origin', 'master', {args: "--tags"}, function (error) {
+        if (error) {
+            throw error
+        }
 
-    return gulp.src('')
-        .pipe(git.commit(message))
-        .pipe(git.tag(message));
+        cb();
+    });
 });
+
+// npm publish task
+gulp.task('npm-publish', function(cb) {
+    var pkg = require(file.package_json);
+
+    npm.load(pkg, function(error) {
+        if (error) {
+            throw error;
+        }
+
+        npm.commands.publish([], function (error, data) {
+            if (error) {
+                throw error;
+            }
+
+            cb();
+        });
+    });
+});
+
+// publish task
+gulp.task('publish', sequence(
+    'git-commit',
+    'git-tag',
+    'git-push',
+    'npm-publish'
+));
