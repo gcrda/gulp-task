@@ -1,6 +1,6 @@
 {
   "name": "@gcrda/gulp-task",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Task helper for Gulp to make tasks easier to manage and handle accross multiple files",
   "license": "MIT",
   "author": "Richard King <richrdkng@gmail.com> (github.com/richrdkng)",
