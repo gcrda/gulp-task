@@ -18,7 +18,7 @@ var include  = require('rekuire'),
     };
 
 // bump tasks
-gulp.task('bump', ['bump-minor']);
+gulp.task('bump', ['bump-patch']);
 
     gulp.task('bump-major', function() {
         return gulp
